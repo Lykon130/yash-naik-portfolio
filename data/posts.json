@@ -1,6 +1,29 @@
 [
-  { "id": "s1", "name": "Boardroom AI: Monday Reality Check", "posts": [] },
-  { "id": "s2", "name": "Under the Hood: AI Systems", "posts": [] },
-  { "id": "s3", "name": "Beginner's AI Blueprint", "posts": [] },
-  { "id": "s4", "name": "The PsyBuddy Initiative", "posts": [] }
+  {
+    "id": "s1",
+    "name": "Boardroom AI: Monday Reality Check",
+    "posts": []
+  },
+  {
+    "id": "s2",
+    "name": "Under the Hood: AI Systems",
+    "posts": []
+  },
+  {
+    "id": "s3",
+    "name": "Beginner's AI Blueprint",
+    "posts": [
+      {
+        "id": "p1788869274462",
+        "title": "Beginner’s AI Blueprint - A Weekly Roadmap to Actually Understanding AI (Starting From Zero)",
+        "content": "Hey, welcome—really glad you’re here.\n\nIf you’ve ever seen terms like \"neural networks\" or \"deep learning\" and quietly closed the tab, this series was made for you.\n\nNo judgment. AI can feel like it belongs to a special club of math geniuses and hardcore coders—and most learning resources do absolutely nothing to help that impression.\n\nThis one’s different. I’m starting from zero, and we’re going at a pace that actually makes sense.\nSo why am I doing this?\nAI is quietly reshaping pretty much everything around us—the shows Netflix suggests, the route Google Maps picks, and even how doctors detect disease earlier. It’s fascinating stuff. But whenever I looked for beginner resources, they’d either drown me in jargon or assume I already knew Python and calculus.\n\nSo I decided to just build the series I wish had existed when I started.\n\nHere’s the rough plan:\n\nWeeks 1–4—We get the foundations right. What AI actually is, the key ideas behind it, and some simple tools you can play with. Zero code required.\n\nWeeks 5–12—We get our hands dirty. A gentle intro to Python, and your very first ML models (they’re more approachable than they sound, I promise).\n\nWeek 13 onwards—The exciting stuff. Neural networks, real projects, and eventually deploying something you actually built.\n\nOne post a week. Short enough to read with your morning coffee, practical enough that you’ll actually learn something.\n\nEvery week you’ll get:\nExplanations that use real, everyday examples (seriously—if I can’t explain it simply, I’ll try again until I can). Step-by-step guides, free tools, and small challenges to test what you’ve learned. And absolutely no assumed knowledge—just bring your curiosity.\n\nThat’s it. No prerequisites, no gatekeeping.\nI’d love to know—what's your biggest question about AI right now? Drop it in the comments. There are no silly questions here, and your question might just shape a future post.\n\nI’ll see you every week.\n\nLet’s build something together.",
+        "image": "assets/uploads/p1788869274462.jpg"
+      }
+    ]
+  },
+  {
+    "id": "s4",
+    "name": "The PsyBuddy Initiative",
+    "posts": []
+  }
 ]
