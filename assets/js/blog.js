@@ -4,7 +4,7 @@ const DATA_PATH = 'data/posts.json';
 
 // Set this to your deployed Worker's URL (see worker/README.md), e.g.
 // 'https://yn-blog-api.<your-subdomain>.workers.dev'
-const WORKER_URL = '';
+const WORKER_URL = 'https://yn-blog-api.lykon013.workers.dev';
 
 const DEFAULT_SERIES = [
   { id: 's1', name: 'Boardroom AI: Monday Reality Check', posts: [] },
