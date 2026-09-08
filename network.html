@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Network — Yash Naik</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<header class="page-header">
+  <a href="index.html">Back to Portfolio</a>
+  <nav><a href="blog.html">Blog</a></nav>
+</header>
+
+<div class="page-intro">
+  <div class="eyebrow">SELECTED WORK · NETWORK VIEW</div>
+  <h1>A Brain Made of Shipped Systems</h1>
+  <p>Every node is a project. Violet nodes were built for an organization; cyan nodes are personal builds. Hover a node to see what it does and who it was for.</p>
+</div>
+
+<div class="graph-wrap" id="graph-wrap">
+  <svg id="graph-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+  <div id="graph-nodes"></div>
+  <div class="node-tooltip" id="node-tooltip" style="display:none">
+    <div class="t-org" id="tooltip-org"></div>
+    <div class="t-title" id="tooltip-title"></div>
+    <div class="t-desc" id="tooltip-desc"></div>
+  </div>
+</div>
+
+<div class="graph-legend">
+  <div class="item"><span class="dot" style="background:var(--accent)"></span>Organization project</div>
+  <div class="item"><span class="dot" style="background:var(--accent2)"></span>Personal project</div>
+</div>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/network.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing — Yash Naik</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<header class="page-header">
+  <a href="index.html">Back to Portfolio</a>
+  <nav>
+    <a href="network.html">Projects</a>
+    <span class="blog-header-star" id="admin-star"></span>
+    <span class="admin-link" id="export-link" style="display:none">Export Data</span>
+  </nav>
+</header>
+
+<div id="list-view">
+  <div class="page-intro">
+    <div class="eyebrow">WRITING</div>
+    <h1>Series &amp; Notes</h1>
+    <p>Long-running threads on building AI systems, in public.</p>
+  </div>
+  <div class="series-grid" id="series-grid"></div>
+</div>
+
+<div id="detail-view" style="display:none">
+  <div class="detail-header">
+    <button class="btn-outline" id="back-to-list">← All Series</button>
+    <h1 id="detail-title"></h1>
+  </div>
+  <div class="posts-grid" id="posts-grid"></div>
+  <div class="form-card" id="new-post-form" style="display:none">
+    <input type="text" id="new-post-title" placeholder="Post title">
+    <textarea id="new-post-content" placeholder="Write your post..."></textarea>
+    <input type="file" id="new-post-image" accept="image/*">
+    <div class="form-preview" id="new-post-preview"></div>
+    <div class="form-actions">
+      <button class="btn-solid" id="save-new-post">Publish Post</button>
+      <button class="btn-outline" id="cancel-new-post">Cancel</button>
+    </div>
+  </div>
+  <button class="add-post-btn" id="open-new-post" style="display:none">+ New Post</button>
+</div>
+
+<div id="post-view" style="display:none">
+  <div class="post-view-wrap">
+    <button class="btn-outline" id="back-to-series">← Back</button>
+    <h1 id="post-view-title"></h1>
+    <div class="post-view-image" id="post-view-image"></div>
+    <p class="post-view-content" id="post-view-content"></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="login-overlay">
+  <div class="modal">
+    <h2>Admin Sign In</h2>
+    <div class="error" id="login-error" style="display:none"></div>
+    <input type="text" id="login-user" placeholder="Username">
+    <input type="password" id="login-pass" placeholder="Password">
+    <div class="form-actions">
+      <button class="btn-solid" id="login-submit">Sign In</button>
+      <button class="btn-outline" id="login-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/blog.js"></script>
+</body>
+</html>
