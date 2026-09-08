@@ -1,10 +1,10 @@
 const ADMIN_KEY = 'yn_blog_admin_v1';
-const TOKEN_KEY = 'yn_gh_token';
-const GH_OWNER = 'Lykon130';
-const GH_REPO = 'yash-naik-portfolio';
-const GH_BRANCH = 'master';
+const WORKER_KEY = 'yn_worker_key';
 const DATA_PATH = 'data/posts.json';
-const UPLOADS_DIR = 'assets/uploads';
+
+// Set this to your deployed Worker's URL (see worker/README.md), e.g.
+// 'https://yn-blog-api.<your-subdomain>.workers.dev'
+const WORKER_URL = '';
 
 const DEFAULT_SERIES = [
   { id: 's1', name: 'Boardroom AI: Monday Reality Check', posts: [] },
@@ -13,61 +13,40 @@ const DEFAULT_SERIES = [
   { id: 's4', name: 'The PsyBuddy Initiative', posts: [] }
 ];
 
-// ---------- GitHub Contents API helpers ----------
+// ---------- publish Worker helpers ----------
+// The browser never talks to GitHub directly. It sends an admin password
+// (WORKER_KEY, chosen by you when you deployed the Worker) to the Worker,
+// which holds the real GitHub token server-side and makes the commit.
 
-function ghToken() {
-  try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+function workerKey() {
+  try { return localStorage.getItem(WORKER_KEY) || ''; } catch (e) { return ''; }
 }
-function setGhToken(t) {
-  try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {}
+function setWorkerKey(k) {
+  try { localStorage.setItem(WORKER_KEY, k); } catch (e) {}
 }
-function clearGhToken() {
-  try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
-}
-
-async function ghGetFile(path) {
-  const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`, {
-    headers: { Authorization: `Bearer ${ghToken()}`, Accept: 'application/vnd.github+json' }
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`GitHub GET ${path} failed: ${res.status}`);
-  return res.json();
+function clearWorkerKey() {
+  try { localStorage.removeItem(WORKER_KEY); } catch (e) {}
 }
 
-async function ghPutFile(path, base64Content, message, sha) {
-  const body = { message, content: base64Content, branch: GH_BRANCH };
-  if (sha) body.sha = sha;
-  const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${ghToken()}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json'
-    },
+async function workerRequest(path, body) {
+  if (!WORKER_URL) throw new Error('WORKER_URL is not set in blog.js — deploy the Worker first (see worker/README.md).');
+  const res = await fetch(WORKER_URL + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${workerKey()}` },
     body: JSON.stringify(body)
   });
-  if (!res.ok) {
-    const detail = await res.json().catch(() => ({}));
-    throw new Error(`GitHub PUT ${path} failed: ${res.status} ${detail.message || ''}`);
-  }
-  return res.json();
-}
-
-function utf8ToBase64(str) {
-  return btoa(unescape(encodeURIComponent(str)));
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+  return data;
 }
 
 async function publishSeries(series, message) {
-  const existing = await ghGetFile(DATA_PATH).catch(() => null);
-  const sha = existing ? existing.sha : undefined;
-  await ghPutFile(DATA_PATH, utf8ToBase64(JSON.stringify(series, null, 2)), message, sha);
+  await workerRequest('/api/publish', { series, message });
 }
 
 async function uploadImage(dataUrl, id) {
-  const base64 = dataUrl.split(',')[1];
-  const path = `${UPLOADS_DIR}/${id}.jpg`;
-  await ghPutFile(path, base64, `Add image for post ${id}`);
-  return path;
+  const data = await workerRequest('/api/upload', { id, dataUrl });
+  return data.path;
 }
 
 async function loadSeries() {
@@ -114,10 +93,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function withPublish(action, successMsg) {
-    if (!ghToken()) {
-      const t = window.prompt('Enter a GitHub Personal Access Token (fine-grained, scoped to this repo, Contents: read & write):');
-      if (!t) return false;
-      setGhToken(t.trim());
+    if (!workerKey()) {
+      const k = window.prompt('Enter the admin password you set when deploying the publish Worker:');
+      if (!k) return false;
+      setWorkerKey(k.trim());
     }
     setBusy(true);
     try {
@@ -125,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return true;
     } catch (e) {
       console.error(e);
-      window.alert('Publish failed: ' + e.message + '\n\nCheck that your token is valid and has Contents write access to this repo.');
+      window.alert('Publish failed: ' + e.message);
       return false;
     } finally {
       setBusy(false);
@@ -332,11 +311,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
   tokenLink.addEventListener('click', () => {
-    if (ghToken()) {
-      if (window.confirm('Clear the stored GitHub token from this browser?')) clearGhToken();
+    if (workerKey()) {
+      if (window.confirm('Clear the stored admin password from this browser?')) clearWorkerKey();
     } else {
-      const t = window.prompt('Enter a GitHub Personal Access Token (fine-grained, scoped to this repo, Contents: read & write):');
-      if (t) setGhToken(t.trim());
+      const k = window.prompt('Enter the admin password you set when deploying the publish Worker:');
+      if (k) setWorkerKey(k.trim());
     }
   });
 

@@ -12,6 +12,7 @@ Personal portfolio site: a scrolling home page, an animated project-network visu
 - `assets/css/style.css` — all styling
 - `assets/js/common.js` — shared starfield + cursor fx + scroll progress
 - `assets/js/home.js`, `assets/js/network.js`, `assets/js/blog.js` — per-page logic
+- `worker/` — a small Cloudflare Worker that publishes blog posts to this repo on the admin's behalf (see below)
 
 ## Local preview
 
@@ -23,21 +24,21 @@ npx serve .
 
 or open `index.html` directly in a browser.
 
-## Blog storage: GitHub as the backend
+## Blog storage: GitHub as the backend, via a Worker
 
-There's no server. The blog reads its content from [`data/posts.json`](data/posts.json), which is just a file in this repo. Every visitor's browser fetches that file directly from GitHub Pages, so everyone sees the same content — no per-visitor `localStorage` drift, no manual export/paste step.
+There's no traditional server. The blog reads its content from [`data/posts.json`](data/posts.json), which is just a file in this repo. Every visitor's browser fetches that file directly from GitHub Pages, so everyone sees the same content — no per-visitor `localStorage` drift, no manual export/paste step.
 
-Publishing a post writes directly back into the repo via the GitHub REST API:
+Publishing a post does **not** talk to GitHub directly from the browser (that would mean shipping a GitHub token in public client-side code). Instead it goes through the small Cloudflare Worker in [`worker/`](worker/), which holds the real GitHub token server-side:
 
-1. Open the blog, click the small glowing dot next to "Projects" (or click a background star), sign in with `lykon` / `lykon`. This is just a UI gate, not real security — see below.
-2. The first time you create a series or post, you'll be asked for a **GitHub Personal Access Token**. Create one at [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new):
-   - **Repository access**: only this repository (`yash-naik-portfolio`)
-   - **Permissions**: Contents → Read and write
-   - Nothing else needed.
-3. Paste the token when prompted. It's stored in that browser's `localStorage` (key `yn_gh_token`) so you're not asked again on that device.
-4. From then on, creating a series/post commits directly to `data/posts.json` (and uploads images to `assets/uploads/`) on the `master` branch. GitHub Pages rebuilds automatically — the change is live for everyone within roughly a minute.
+```
+browser → Worker (checks an admin password) → GitHub API (Worker's token) → commit → Pages rebuild
+```
 
-**Security note:** the token lives in that browser's `localStorage`, in plaintext, for as long as it's there. Anyone with access to that browser/profile could use it to push commits to this repo. Because the token is scoped to only this one repository with only Contents read/write, the worst case is limited to this repo (not your whole GitHub account) — but still, only do this on a device you trust, and revoke/regenerate the token from GitHub settings if that ever changes. You can also clear the stored token any time via the "GitHub Token" link in the admin header.
+**Setup (one-time):** follow [`worker/README.md`](worker/README.md) to deploy the Worker and get its URL, then paste that URL into `WORKER_URL` near the top of `assets/js/blog.js` and push.
+
+**Using it:** open the blog, click the small glowing dot next to "Projects" (or click a background star), sign in with `lykon` / `lykon` — this is just a UI gate, not real security. The first time you publish something, you'll be asked for the **admin password** you chose while deploying the Worker (not a GitHub token). It's stored in that browser's `localStorage` so you're not asked again on that device. From then on, creating a series/post commits straight to `data/posts.json` (and uploads images to `assets/uploads/`); GitHub Pages rebuilds automatically and the change is live for everyone within roughly a minute.
+
+**Security note:** the admin password lives in that browser's `localStorage` in plaintext. Anyone with access to that browser/profile could use it to publish through the Worker — but the Worker only exposes two narrow actions (update `data/posts.json`, add a file under `assets/uploads/`), so even a leaked password can't do anything beyond that, and the real GitHub token never leaves the Worker. Only sign in on devices you trust, and you can clear the stored password any time via the "Admin Password" link in the admin header, or rotate it by re-running `wrangler secret put ADMIN_KEY`.
 
 ## Credits
 

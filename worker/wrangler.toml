@@ -1,0 +1,10 @@
+name = "yn-blog-api"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://lykon130.github.io"
+
+# Secrets (set these with `wrangler secret put <NAME>`, never here):
+#   GITHUB_TOKEN — fine-grained PAT scoped to the yash-naik-portfolio repo, Contents: read/write
+#   ADMIN_KEY    — a password you invent yourself; the blog's admin UI sends this, not the GitHub token
