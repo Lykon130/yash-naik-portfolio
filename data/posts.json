@@ -2,7 +2,14 @@
   {
     "id": "s1",
     "name": "Boardroom AI: Monday Reality Check",
-    "posts": []
+    "posts": [
+      {
+        "id": "p1788870851011",
+        "title": "Boardroom AI: Monday Reality Check",
+        "content": "There’s a directive echoing through boardrooms right now, and you’ve almost certainly heard it: \"We need to integrate AI.\"\n\nBut here’s what usually happens next—a lot of nodding, a few expensive pilots, and mounting frustration with very little to show for it.\n\nWe’re drowning in AI noise. And for the directors, department heads, and CXOs actually held accountable for results, the gap between the hype and the reality has never felt wider.\nI’ve spent my career as an AI/ML engineer building these systems from scratch. Which means I see the stuff that never makes it onto the executive slide deck—the data silos, the scalability assumptions that fall apart under real conditions, and the chasm between a slick demo and something that actually moves the needle on ROI.\n\nWhen I talk to leaders, the frustration isn’t usually with the technology. It’s that nobody is giving them a straight answer about what it actually takes to make it work.\n\nSo here’s why I’m starting this series.\n\nEvery Monday, I’ll be cutting through the noise with one clear, grounded insight—no technical rabbit holes, no miracle-cure promises. Just a high-signal briefing for the people responsible for the bottom line and the long game.\n\nEach week, I’ll be focused on three things that actually matter at the executive level:\nRisk—the hidden liabilities sitting inside your current AI roadmap\nReadiness—whether your organization is actually set up for AI or needs a foundation reset first\nROI—shifting the conversation from \"how do we use AI?\" to \"what specific problem are we solving?\"\n\nMy commitment to you is simple. By the time your first Monday meeting kicks off, you’ll have one perspective-shifting insight you can actually use—whether that’s challenging a flawed assumption or giving your team a sharper direction.\nThis series is for leaders who are done chasing the hype cycle and want to build something that lasts.\n\nNow I want to hear from you.\nWhat’s the biggest AI frustration coming up in your boardroom right now? Is it the cost? The uncertainty? Data quality? The team’s ability to deliver?\n\nDrop it in the comments or send me a message. Let’s make this a two-way conversation—because the reality check your organization needs probably starts with saying the quiet part out loud.",
+        "image": "assets/uploads/p1788870851011.jpg"
+      }
+    ]
   },
   {
     "id": "s2",
