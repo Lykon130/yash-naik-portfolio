@@ -1,5 +1,11 @@
-const STORAGE_KEY = 'yn_blog_series_v1';
 const ADMIN_KEY = 'yn_blog_admin_v1';
+const TOKEN_KEY = 'yn_gh_token';
+const GH_OWNER = 'Lykon130';
+const GH_REPO = 'yash-naik-portfolio';
+const GH_BRANCH = 'master';
+const DATA_PATH = 'data/posts.json';
+const UPLOADS_DIR = 'assets/uploads';
+
 const DEFAULT_SERIES = [
   { id: 's1', name: 'Boardroom AI: Monday Reality Check', posts: [] },
   { id: 's2', name: 'Under the Hood: AI Systems', posts: [] },
@@ -7,32 +13,79 @@ const DEFAULT_SERIES = [
   { id: 's4', name: 'The PsyBuddy Initiative', posts: [] }
 ];
 
-function loadSeries() {
+// ---------- GitHub Contents API helpers ----------
+
+function ghToken() {
+  try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+}
+function setGhToken(t) {
+  try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {}
+}
+function clearGhToken() {
+  try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+}
+
+async function ghGetFile(path) {
+  const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`, {
+    headers: { Authorization: `Bearer ${ghToken()}`, Accept: 'application/vnd.github+json' }
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub GET ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+async function ghPutFile(path, base64Content, message, sha) {
+  const body = { message, content: base64Content, branch: GH_BRANCH };
+  if (sha) body.sha = sha;
+  const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${ghToken()}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    throw new Error(`GitHub PUT ${path} failed: ${res.status} ${detail.message || ''}`);
+  }
+  return res.json();
+}
+
+function utf8ToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function publishSeries(series, message) {
+  const existing = await ghGetFile(DATA_PATH).catch(() => null);
+  const sha = existing ? existing.sha : undefined;
+  await ghPutFile(DATA_PATH, utf8ToBase64(JSON.stringify(series, null, 2)), message, sha);
+}
+
+async function uploadImage(dataUrl, id) {
+  const base64 = dataUrl.split(',')[1];
+  const path = `${UPLOADS_DIR}/${id}.jpg`;
+  await ghPutFile(path, base64, `Add image for post ${id}`);
+  return path;
+}
+
+async function loadSeries() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    const res = await fetch(DATA_PATH + '?t=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) return await res.json();
   } catch (e) {}
   return DEFAULT_SERIES;
 }
 
-function persist(series) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(series));
-  } catch (e) {
-    window.alert('Could not save: browser storage is full (likely from a large image). Try a smaller image, or use Export Data to back up your posts.');
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  let series = loadSeries();
+document.addEventListener('DOMContentLoaded', async () => {
+  let series = await loadSeries();
   let isAdmin = (() => { try { return localStorage.getItem(ADMIN_KEY) === '1'; } catch (e) { return false; } })();
   let view = 'list';
   let activeSeriesId = null;
   let activePostId = null;
   let newPostImage = null;
-  let stars = [];
-
-  const canvas = document.getElementById('starfield');
+  let publishing = false;
 
   const listView = document.getElementById('list-view');
   const detailView = document.getElementById('detail-view');
@@ -43,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const newPostForm = document.getElementById('new-post-form');
   const openNewPostBtn = document.getElementById('open-new-post');
   const exportLink = document.getElementById('export-link');
+  const tokenLink = document.getElementById('token-link');
   const adminStar = document.getElementById('admin-star');
   const loginOverlay = document.getElementById('login-overlay');
   const loginError = document.getElementById('login-error');
@@ -52,6 +106,30 @@ document.addEventListener('DOMContentLoaded', () => {
     listView.style.display = v === 'list' ? '' : 'none';
     detailView.style.display = v === 'detail' ? '' : 'none';
     postView.style.display = v === 'post' ? '' : 'none';
+  }
+
+  function setBusy(b) {
+    publishing = b;
+    document.querySelectorAll('.btn-solid').forEach((btn) => { btn.disabled = b; btn.style.opacity = b ? 0.6 : ''; });
+  }
+
+  async function withPublish(action, successMsg) {
+    if (!ghToken()) {
+      const t = window.prompt('Enter a GitHub Personal Access Token (fine-grained, scoped to this repo, Contents: read & write):');
+      if (!t) return false;
+      setGhToken(t.trim());
+    }
+    setBusy(true);
+    try {
+      await action();
+      return true;
+    } catch (e) {
+      console.error(e);
+      window.alert('Publish failed: ' + e.message + '\n\nCheck that your token is valid and has Contents write access to this repo.');
+      return false;
+    } finally {
+      setBusy(false);
+    }
   }
 
   function renderList() {
@@ -87,12 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = seriesGrid.querySelector('.add-series-btn');
     if (addBtn) addBtn.style.display = 'none';
     form.querySelector('#cancel-series').addEventListener('click', () => renderList());
-    form.querySelector('#save-series').addEventListener('click', () => {
+    form.querySelector('#save-series').addEventListener('click', async () => {
       const name = form.querySelector('#new-series-name').value.trim();
-      if (!name) return;
-      series = [...series, { id: 's' + Date.now(), name, posts: [] }];
-      persist(series);
-      renderList();
+      if (!name || publishing) return;
+      const updated = [...series, { id: 's' + Date.now(), name, posts: [] }];
+      const ok = await withPublish(() => publishSeries(updated, `Add series: ${name}`));
+      if (ok) { series = updated; renderList(); }
     });
   }
 
@@ -182,24 +260,34 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     reader.readAsDataURL(file);
   });
-  document.getElementById('save-new-post').addEventListener('click', () => {
-    if (!isAdmin) return;
+  document.getElementById('save-new-post').addEventListener('click', async () => {
+    if (!isAdmin || publishing) return;
     const title = document.getElementById('new-post-title').value.trim();
     const content = document.getElementById('new-post-content').value.trim();
     if (!title || !content) return;
-    const post = { id: 'p' + Date.now(), title, content, image: newPostImage };
-    series = series.map((s) => s.id === activeSeriesId ? { ...s, posts: [post, ...s.posts] } : s);
-    persist(series);
-    newPostForm.style.display = 'none';
-    renderDetail();
+    const id = 'p' + Date.now();
+
+    const ok = await withPublish(async () => {
+      let imagePath = null;
+      if (newPostImage) imagePath = await uploadImage(newPostImage, id);
+      const post = { id, title, content, image: imagePath };
+      const updated = series.map((s) => s.id === activeSeriesId ? { ...s, posts: [post, ...s.posts] } : s);
+      await publishSeries(updated, `Add post: ${title}`);
+      series = updated;
+    });
+    if (ok) {
+      newPostForm.style.display = 'none';
+      renderDetail();
+    }
   });
 
   document.getElementById('back-to-list').addEventListener('click', () => { showView('list'); renderList(); });
   document.getElementById('back-to-series').addEventListener('click', () => { showView('detail'); renderDetail(); });
 
-  // Admin gate
+  // ---------- Admin gate ----------
   function updateAdminUI() {
     exportLink.style.display = isAdmin ? '' : 'none';
+    tokenLink.style.display = isAdmin ? '' : 'none';
   }
   function openLogin() {
     document.getElementById('login-user').value = '';
@@ -238,22 +326,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const json = JSON.stringify(series, null, 2);
     try {
       navigator.clipboard.writeText(json);
-      window.alert('Blog data copied to clipboard. Paste it somewhere safe — for permanent storage, replace DEFAULT_SERIES in blog.js with this.');
+      window.alert('Blog data copied to clipboard.');
     } catch (e) {
       window.prompt('Copy this JSON manually:', json);
     }
   });
+  tokenLink.addEventListener('click', () => {
+    if (ghToken()) {
+      if (window.confirm('Clear the stored GitHub token from this browser?')) clearGhToken();
+    } else {
+      const t = window.prompt('Enter a GitHub Personal Access Token (fine-grained, scoped to this repo, Contents: read & write):');
+      if (t) setGhToken(t.trim());
+    }
+  });
 
   // Clicking a starfield particle also opens the admin login
-  canvas.addEventListener('click', (e) => {
-    if (!window.__starRef || !window.__starRef.stars) return;
+  let starRef = null;
+  document.getElementById('starfield').addEventListener('click', (e) => {
+    if (!starRef || !starRef.stars) return;
+    const canvas = starRef.canvas;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left, y = e.clientY - rect.top;
-    const hit = window.__starRef.stars.some((st) => Math.hypot(st.x - x, st.y - y) < 9);
+    const hit = starRef.stars.some((st) => Math.hypot(st.x - x, st.y - y) < 9);
     if (hit) adminAction();
   });
 
-  window.__starRef = initStarfield('starfield', 150);
+  starRef = initStarfield('starfield', 150);
   updateAdminUI();
   renderList();
 });
