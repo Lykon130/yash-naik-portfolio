@@ -111,6 +111,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Always re-fetch the latest published data right before merging in a
+  // change, so a stale/long-open tab can't clobber posts added elsewhere
+  // since this tab loaded (each publish overwrites the whole file).
+  async function mutate(mutateFn, message) {
+    return withPublish(async () => {
+      const latest = await loadSeries();
+      const updated = mutateFn(latest);
+      await publishSeries(updated, message);
+      series = updated;
+    });
+  }
+
   function renderList() {
     seriesGrid.innerHTML = '';
     series.forEach((sr) => {
@@ -120,6 +132,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.innerHTML = `<div class="series-count">${count}</div><h3 class="series-name"></h3>`;
       card.querySelector('.series-name').textContent = sr.name;
       card.addEventListener('click', () => openSeries(sr.id));
+      if (isAdmin) {
+        const del = document.createElement('button');
+        del.className = 'card-delete';
+        del.title = 'Delete series';
+        del.textContent = '×';
+        del.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (publishing) return;
+          if (!window.confirm(`Delete the series "${sr.name}" and all its posts? This can't be undone.`)) return;
+          const ok = await mutate((latest) => latest.filter((s) => s.id !== sr.id), `Delete series: ${sr.name}`);
+          if (ok) renderList();
+        });
+        card.appendChild(del);
+      }
       seriesGrid.appendChild(card);
     });
     if (isAdmin) {
@@ -147,9 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.querySelector('#save-series').addEventListener('click', async () => {
       const name = form.querySelector('#new-series-name').value.trim();
       if (!name || publishing) return;
-      const updated = [...series, { id: 's' + Date.now(), name, posts: [] }];
-      const ok = await withPublish(() => publishSeries(updated, `Add series: ${name}`));
-      if (ok) { series = updated; renderList(); }
+      const ok = await mutate((latest) => [...latest, { id: 's' + Date.now(), name, posts: [] }], `Add series: ${name}`);
+      if (ok) renderList();
     });
   }
 
@@ -176,6 +201,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.querySelector('h3').textContent = p.title;
         card.querySelector('p').textContent = excerpt;
         card.addEventListener('click', () => openPost(p.id));
+        if (isAdmin) {
+          const del = document.createElement('button');
+          del.className = 'card-delete';
+          del.title = 'Delete post';
+          del.textContent = '×';
+          del.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (publishing) return;
+            if (!window.confirm(`Delete the post "${p.title}"? This can't be undone.`)) return;
+            const ok = await mutate(
+              (latest) => latest.map((s) => s.id === activeSeriesId ? { ...s, posts: s.posts.filter((post) => post.id !== p.id) } : s),
+              `Delete post: ${p.title}`
+            );
+            if (ok) renderDetail();
+          });
+          card.appendChild(del);
+        }
         postsGrid.appendChild(card);
       });
     }
@@ -198,7 +240,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     imgEl.className = 'post-view-image' + (post.image ? ' has-img' : '');
     imgEl.style.backgroundImage = post.image ? `url(${post.image})` : '';
     document.getElementById('post-view-content').textContent = post.content;
+    document.getElementById('delete-post-btn').style.display = isAdmin ? '' : 'none';
   }
+
+  document.getElementById('delete-post-btn').addEventListener('click', async () => {
+    if (!isAdmin || publishing) return;
+    const activeSeries = series.find((s) => s.id === activeSeriesId) || { name: '', posts: [] };
+    const post = activeSeries.posts.find((p) => p.id === activePostId);
+    if (!post) return;
+    if (!window.confirm(`Delete the post "${post.title}"? This can't be undone.`)) return;
+    const ok = await mutate(
+      (latest) => latest.map((s) => s.id === activeSeriesId ? { ...s, posts: s.posts.filter((p) => p.id !== activePostId) } : s),
+      `Delete post: ${post.title}`
+    );
+    if (ok) { showView('detail'); renderDetail(); }
+  });
 
   function resetNewPostForm() {
     document.getElementById('new-post-title').value = '';
@@ -250,7 +306,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       let imagePath = null;
       if (newPostImage) imagePath = await uploadImage(newPostImage, id);
       const post = { id, title, content, image: imagePath };
-      const updated = series.map((s) => s.id === activeSeriesId ? { ...s, posts: [post, ...s.posts] } : s);
+      const latest = await loadSeries();
+      const updated = latest.map((s) => s.id === activeSeriesId ? { ...s, posts: [post, ...s.posts] } : s);
       await publishSeries(updated, `Add post: ${title}`);
       series = updated;
     });
