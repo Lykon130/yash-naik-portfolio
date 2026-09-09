@@ -1,39 +1,63 @@
 const CLUSTERS = [
-  { org: 'Cinntra', projects: [
-      { title: 'CSQ AI Engine', desc: 'Core AI engine solo-built to power downstream compliance and analytics tooling.' },
-      { title: 'Compliance AI Engine', desc: 'Compliance chatbot answering policy and regulatory questions, led with a team of 4.' },
-      { title: 'Trade Alert Monitoring & Visualization', desc: 'Real-time alert monitoring and visualization for a live trading engine.' },
-      { title: 'Investor Protection Deepfake Analyser', desc: 'AI system flagging manipulated media and investor-fraud signals.' }
+  { org: 'MCX', projects: [
+      { title: 'CSQ AI Engine', tags: ['MCX', 'Ongoing'],
+        desc: 'An AI-powered customer support helpdesk for MCX (commodity exchange) traders — combining a RAG-based knowledge base, LLM query answering, multi-channel ingestion (email/audio/documents), and compliance/audit tooling, all built to run fully air-gapped on-premises with local models for LLM inference, embeddings, transcription, and NER.' },
+      { title: 'Compliance AI Engine', tags: ['MCX', 'Ongoing'],
+        desc: 'An AI-powered Compliance chatbot for MCX (commodity exchange) internal staff — combining a RAG-based knowledge base, LLM query answering, and compliance/audit tooling, all built to run fully air-gapped on-premises with local models for LLM inference and embeddings.' },
+      { title: 'Trade Alert Monitoring & Visualization', tags: ['MCX', 'Ongoing'],
+        desc: 'Python-based automated validation engine that extracts trade alerts from databases and evaluates them against configurable time windows, threshold checks, and multiple business-rule conditions to classify alerts as genuine or false positives. Built an end-to-end analysis and audit layer that generates visualizations and validation metrics, maintains detailed execution logs, and provides traceability for every alert decision.' },
+      { title: 'Investor Protection Deepfake Analyser', tags: ['MCX', 'Ongoing'],
+        desc: 'AI-powered media verification system to detect potential deepfakes across images and videos by analyzing visual artifacts, facial/manipulation patterns, and contextual information associated with the content. Designed the system to assess media authenticity and flag potentially manipulated or misleading content, supporting investor protection and reducing risks from AI-generated misinformation.' }
     ] },
-  { org: 'Aeonx Digital', projects: [
-      { title: 'Azure to GCP Migration', desc: 'Full migration of datasets, ADF pipelines, and workflow architecture across clouds.' },
-      { title: 'Lead Prediction Model', desc: 'ML model evaluating multiple algorithms to prioritize real-estate sales leads.' },
-      { title: 'CommHum', desc: 'Solo-built communication tooling connecting product and support workflows.' }
+  { org: 'Aeonx', projects: [
+      { title: 'Azure to GCP Migration', tags: ['Aeonx', 'Client', '2026'],
+        desc: 'End-to-end migration of enterprise data infrastructure and processing workloads from Azure to Google Cloud Platform (GCP), including databases, stored procedures, views, data pipelines, and dependent business processes. Ensured functional parity, data integrity, pipeline continuity, and minimal disruption while adapting Azure-native components to GCP services and architecture.' },
+      { title: 'Lead Prediction Model', tags: ['Aeonx', 'Client', '2025'],
+        desc: 'Machine Learning–based lead scoring system to predict the probability of prospective clients purchasing a property, enabling sales teams to prioritize high-intent leads. Evaluated and combined multiple ML models with feature engineering, model validation, and probability-based scoring to improve prediction reliability and support data-driven sales decisions.' },
+      { title: 'CommHum', tags: ['Aeonx', '2026'],
+        desc: 'AI-driven communication platform that consolidates and analyzes messages, emails, call transcripts, and field/visit reports to provide a unified view of customer and stakeholder interactions. Built intelligent response-generation capabilities that analyze conversation context, intent, and sentiment to draft contextually appropriate replies while adapting the language and tone to match the original communication.' }
     ] },
   { org: 'TCS', projects: [
-      { title: 'PDF Splitter & Payload Generator', desc: 'Tool generating multiple PDF and XML files for archival, owned end-to-end.' },
-      { title: 'Policy & Claim Management System', desc: 'System streamlining claims processing and policy administration for a BFSI client.' },
-      { title: 'CMIO Migration', desc: 'Java/Oracle migration project delivered with a 5-person team.' }
-    ] },
-  { org: 'Mbit India', projects: [
-      { title: 'Archive Conditioner', desc: 'End-to-end archiving system for confidential documents.' }
+      { title: 'PDF Splitter & Payload Generator', tags: ['TCS', 'Client', '2025'],
+        desc: 'Java-based document processing application to split large consolidated PDF records into client ID–specific document chunks, enabling efficient downstream ingestion and retrieval. Automated the generation of detailed XML metadata for each extracted document, ensuring accurate client-level mapping, traceability, and structured document processing.' },
+      { title: 'Policy & Claim Management System', tags: ['TCS', 'Client', '2025'],
+        desc: 'AI-driven insurance platform to streamline policy and claim processing by extracting and validating information from claim documents, automating claim form completion, and assessing claims against policy rules and historical patterns. Implemented AI/ML-based fraud detection to identify anomalous, inconsistent, or potentially fraudulent claims and flag them for further investigation.' },
+      { title: 'CMIO Migration', tags: ['TCS', 'Client', '2024'],
+        desc: 'Java-based end-to-end migration solution to transfer banking applications, programs, business processes, databases, and enterprise data from an acquired bank to the parent bank. Ensured data integrity, process compatibility, and seamless integration of migrated systems while minimizing disruption to critical banking operations.' },
+      { title: 'Archive Conditioner', tags: ['TCS', 'Client', '2023'],
+        desc: 'Java-based data archival solution to identify and archive redundant, inactive, and historical client data from banking systems based on predefined retention and archival policies. Automated data extraction, validation, and archival workflows while maintaining data integrity, auditability, and accessibility of archived records for regulatory and business requirements.' }
     ] },
   { org: 'CSPL', projects: [
-      { title: 'Attendance Management System', desc: 'Attendance tracking system delivered with a 3-person team.' },
-      { title: 'Office Management System', desc: 'Office management platform built for a Maharashtra government client.' }
+      { title: 'Attendance Manager', tags: ['CSPL', 'Client', '2021'],
+        desc: 'C#/.NET-based attendance management system for MNC clients to automate employee attendance tracking, shift and work-hour management, and attendance record processing. Implemented backend business logic, database integration, validations, and reporting workflows to support accurate and scalable workforce management across enterprise environments.' },
+      { title: 'Office Manager', tags: ['CSPL', 'Client', '2021'],
+        desc: 'C# based internal office management platform for a Maharashtra-based political organization to digitize and streamline day-to-day administrative operations, employee coordination, task tracking, and organizational workflows. Implemented backend services, database management, role-based access, and workflow automation to improve operational efficiency and centralized information management.' }
     ] },
-  { org: 'CShells Impex', projects: [
-      { title: 'Stock Management System', desc: 'Stock management system built solo from concept to deployment.' },
-      { title: 'Billing System', desc: 'Billing system built solo alongside the stock management platform.' },
-      { title: 'Expense-Splitting Application', desc: 'Proprietary expense-splitting app (Dutch method) now used by 90+ organizations.' }
+  { org: 'CShells', projects: [
+      { title: 'Inventory Buddy', tags: ['CShells', '2020'],
+        desc: 'Java-based inventory management application to automate end-to-end inventory operations, including product management, stock tracking, inward/outward transactions, inventory updates, and low-stock monitoring. Implemented database-driven workflows and validation mechanisms to maintain accurate inventory records and provide reliable visibility into stock levels and movement.' },
+      { title: 'Billing Buddy', tags: ['CShells', '2019'],
+        desc: 'Java-based billing application to automate invoice generation, product and customer management, pricing calculations, tax/discount handling, and transaction record maintenance. Implemented database-backed business logic and validation workflows to ensure accurate billing, transaction processing, and reliable financial record management.' },
+      { title: 'MoneyD', tags: ['CShells', '2019'],
+        desc: 'Splitwise-like expense management application that enables users to create groups, record shared expenses, and automatically calculate individual liabilities and settlements. Extended the standard expense-splitting model with a "Going Dutch" option for equal bill sharing, along with transaction tracking and simplified settlement calculations.' }
     ] }
 ];
 
 const PERSONAL = [
-  { title: 'PsyBuddy', desc: 'Relational, emotion-aware AI companion architecture for mental health support.' },
-  { title: 'Park Assist', desc: 'Computer-vision-based smart parking detection and allocation system.' },
-  { title: 'NEST', desc: 'Personal knowledge and automation hub tying together notes, tasks, and AI agents.' },
-  { title: 'The UNO AI', desc: 'Unified AI agent orchestrating multiple tools behind one conversational interface.' }
+  { title: 'NEST', tags: ['Personal', 'Ongoing'],
+    desc: 'Building an 11-specialist federated transformer system (~9.4B params) from scratch on a single consumer GPU, using memory-bounded sequential training (bf16, 8-bit offloaded Adam, gradient checkpointing) under a milestone-gated developmental curriculum. Validates staged curriculum learning and workspace-based specialist federation as core research questions; provenance/fault-tolerance infrastructure complete, training pipeline in progress.' },
+  { title: 'RE Predict', tags: ['Personal', 'Ongoing'],
+    desc: 'A full-stack real-estate intelligence SaaS enabling multi-source data ingestion, dynamic ML buyer-propensity predictions, and lead scoring. Developed analytics dashboards and a sales CRM for lead outcomes, property insights, deal pipelines, revenue, commissions, targets, and sales-representative performance tracking.' },
+  { title: 'PsyBuddy', tags: ['Personal', '2025'],
+    desc: 'AI-Powered Mental Health Assistant. Designed and developed a scalable RAG-based conversational AI platform featuring emotion detection, semantic memory, and personalized multi-turn conversations. Engineered a modular backend with triple persona orchestration, long-term memory retrieval, and secure cloud-ready architecture, optimizing AI response quality, contextual relevance, and user experience.' },
+  { title: 'A.T.H.E.N.A', tags: ['Personal', 'Ongoing'],
+    desc: 'A modular AI command platform that orchestrates domain-specific skills across engineering, finance research, planning, and analytics through a centralized routing layer. Designed persistent knowledge management using an Obsidian-based graph vault, with planned HUD and local voice interfaces, while enforcing policy-based safety controls for restricted operations such as automated trading.' },
+  { title: 'The Uno AI', tags: ['Personal', '2026'],
+    desc: 'AI-Powered Social Media Strategy Engine. Designed and developed an AI engine that transforms organization context, budget, objectives, and timelines into data-driven, customized social media strategies.' },
+  { title: 'Park Assist', tags: ['Personal', 'Ongoing'],
+    desc: 'AI-Powered Parking Allocation Engine. Developed an AI-driven parking allocation system that analyzes building and parking blueprints to dynamically assign parking spaces to apartments based on predefined allocation rules and constraints.' },
+  { title: 'B.H.A.I', tags: ['Personal', '2018'],
+    desc: 'Early-stage AI chatbot using Hidden Markov Models (HMMs) and pre-Transformer NLP techniques to experiment with adaptive, personality-driven conversations. Designed the system to learn from user interactions and dynamically adapt its conversational style, with a focus on creating a friendly, sarcastic, and personalized AI personality.' }
 ];
 
 function buildGraph() {
@@ -54,7 +78,7 @@ function buildGraph() {
       const nx = Math.max(6, Math.min(94, ccx + r * Math.cos(subAngle)));
       const ny = Math.max(8, Math.min(94, ccy + r * Math.sin(subAngle) * 0.8));
       const id = cluster.org + '-' + pi;
-      nodes.push({ id, title: p.title, org: cluster.org, desc: p.desc, x: nx, y: ny, personal: false });
+      nodes.push({ id, title: p.title, org: cluster.org, desc: p.desc, tags: p.tags, x: nx, y: ny, personal: false });
       ids.push(id);
     });
     for (let a = 0; a < ids.length; a++) for (let b = a + 1; b < ids.length; b++) rawEdges.push([ids[a], ids[b]]);
@@ -64,7 +88,7 @@ function buildGraph() {
   const nestData = PERSONAL.find((p) => p.title === 'NEST');
   const ringPersonal = PERSONAL.filter((p) => p.title !== 'NEST');
   const nestId = 'Personal-NEST';
-  nodes.push({ id: nestId, title: nestData.title, org: 'Personal', desc: nestData.desc, x: cx, y: cy, personal: true, isHub: true });
+  nodes.push({ id: nestId, title: nestData.title, org: 'Personal', desc: nestData.desc, tags: nestData.tags, x: cx, y: cy, personal: true, isHub: true });
 
   const personalIds = [];
   ringPersonal.forEach((p, pi) => {
@@ -74,7 +98,7 @@ function buildGraph() {
     const nx = cx + r * Math.cos(subAngle);
     const ny = cy + r * Math.sin(subAngle) * 0.8;
     const id = 'Personal-' + pi;
-    nodes.push({ id, title: p.title, org: 'Personal', desc: p.desc, x: nx, y: ny, personal: true });
+    nodes.push({ id, title: p.title, org: 'Personal', desc: p.desc, tags: p.tags, x: nx, y: ny, personal: true });
     personalIds.push(id);
   });
   personalIds.forEach((id) => rawEdges.push([nestId, id]));
@@ -119,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tooltipOrg = document.getElementById('tooltip-org');
   const tooltipTitle = document.getElementById('tooltip-title');
   const tooltipDesc = document.getElementById('tooltip-desc');
+  const tooltipTags = document.getElementById('tooltip-tags');
 
   const lineEls = {};
   GRAPH.rawEdges.forEach((edge, i) => {
@@ -168,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     GRAPH.nodes.forEach((n) => {
       const isHovered = hoveredId === n.id;
       const dim = hoveredId && !isHovered;
-      const size = isHovered ? 16 : 11;
+      const size = isHovered ? 24 : 17;
       const pos = livePos[n.id];
       const dot = dotEls[n.id];
       dot.style.left = pos.x + '%';
@@ -192,6 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltipOrg.style.color = node.personal ? accent2 : accent;
       tooltipTitle.textContent = node.title;
       tooltipDesc.textContent = node.desc;
+      tooltipTags.innerHTML = '';
+      (node.tags || []).forEach((tag) => {
+        const chip = document.createElement('span');
+        chip.className = 't-tag';
+        chip.textContent = tag;
+        tooltipTags.appendChild(chip);
+      });
     } else {
       tooltip.style.display = 'none';
     }
