@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     GRAPH.nodes.forEach((n) => {
       const isHovered = hoveredId === n.id;
       const dim = hoveredId && !isHovered;
-      const size = isHovered ? 24 : 17;
+      const size = isHovered ? 18 : 13;
       const pos = livePos[n.id];
       const dot = dotEls[n.id];
       dot.style.left = pos.x + '%';
