@@ -211,9 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const pos = livePos[hoveredId];
       const node = NODE_MAP[hoveredId];
       tooltip.style.display = 'block';
-      tooltip.style.left = pos.x + '%';
-      tooltip.style.top = pos.y + '%';
-      tooltip.classList.toggle('below', pos.y < 24);
       tooltipOrg.textContent = node.org;
       tooltipOrg.style.color = node.personal ? accent2 : accent;
       tooltipTitle.textContent = node.title;
@@ -225,6 +222,23 @@ document.addEventListener('DOMContentLoaded', () => {
         chip.textContent = tag;
         tooltipTags.appendChild(chip);
       });
+
+      const wrapRect = graphWrap.getBoundingClientRect();
+      const nodePxX = (pos.x / 100) * wrapRect.width;
+      const nodePxY = (pos.y / 100) * wrapRect.height;
+      const margin = 12;
+      const th = tooltip.offsetHeight;
+      const tw = tooltip.offsetWidth;
+      const halfW = tw / 2;
+
+      tooltip.classList.toggle('below', (nodePxY - th - 20) < margin);
+
+      let leftPx = nodePxX;
+      if (leftPx - halfW < margin) leftPx = halfW + margin;
+      if (leftPx + halfW > wrapRect.width - margin) leftPx = wrapRect.width - margin - halfW;
+
+      tooltip.style.left = leftPx + 'px';
+      tooltip.style.top = nodePxY + 'px';
     } else {
       tooltip.style.display = 'none';
     }
