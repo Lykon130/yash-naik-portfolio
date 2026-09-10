@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.style.display = 'block';
       tooltip.style.left = pos.x + '%';
       tooltip.style.top = pos.y + '%';
+      tooltip.classList.toggle('below', pos.y < 24);
       tooltipOrg.textContent = node.org;
       tooltipOrg.style.color = node.personal ? accent2 : accent;
       tooltipTitle.textContent = node.title;
