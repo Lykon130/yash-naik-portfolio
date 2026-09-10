@@ -10,18 +10,26 @@ const GH_BRANCH = 'master';
 const DATA_PATH = 'data/posts.json';
 const UPLOADS_DIR = 'assets/uploads';
 
-function corsHeaders(env) {
+function resolveOrigin(request, env) {
+  const allowed = (env.ALLOWED_ORIGIN || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const origin = request.headers.get('Origin') || '';
+  if (allowed.includes(origin)) return origin;
+  return allowed[0] || '*';
+}
+
+function corsHeaders(request, env) {
   return {
-    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+    'Access-Control-Allow-Origin': resolveOrigin(request, env),
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Vary': 'Origin',
   };
 }
 
-function json(data, status, env) {
+function json(data, status, request, env) {
   return new Response(JSON.stringify(data), {
     status: status || 200,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders(env) },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
   });
 }
 
@@ -76,36 +84,36 @@ function checkAuth(request, env) {
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders(env) });
+      return new Response(null, { status: 204, headers: corsHeaders(request, env) });
     }
 
     const url = new URL(request.url);
 
     if (!checkAuth(request, env)) {
-      return json({ error: 'Unauthorized' }, 401, env);
+      return json({ error: 'Unauthorized' }, 401, request, env);
     }
 
     try {
       if (request.method === 'POST' && url.pathname === '/api/publish') {
         const { series, message } = await request.json();
-        if (!Array.isArray(series)) return json({ error: 'series must be an array' }, 400, env);
+        if (!Array.isArray(series)) return json({ error: 'series must be an array' }, 400, request, env);
         const existing = await ghGetFile(env, DATA_PATH);
         await ghPutFile(env, DATA_PATH, utf8ToBase64(JSON.stringify(series, null, 2)), message || 'Update blog content', existing ? existing.sha : undefined);
-        return json({ ok: true }, 200, env);
+        return json({ ok: true }, 200, request, env);
       }
 
       if (request.method === 'POST' && url.pathname === '/api/upload') {
         const { id, dataUrl } = await request.json();
-        if (!id || !dataUrl || !dataUrl.includes(',')) return json({ error: 'id and dataUrl required' }, 400, env);
+        if (!id || !dataUrl || !dataUrl.includes(',')) return json({ error: 'id and dataUrl required' }, 400, request, env);
         const base64 = dataUrl.split(',')[1];
         const path = `${UPLOADS_DIR}/${id}.jpg`;
         await ghPutFile(env, path, base64, `Add image for post ${id}`);
-        return json({ path }, 200, env);
+        return json({ path }, 200, request, env);
       }
 
-      return json({ error: 'Not found' }, 404, env);
+      return json({ error: 'Not found' }, 404, request, env);
     } catch (err) {
-      return json({ error: err.message || String(err) }, 500, env);
+      return json({ error: err.message || String(err) }, 500, request, env);
     }
   },
 };
