@@ -15,6 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
     titleEl.appendChild(wordEl);
   });
 
+  // Footer quote, typewriter reveal on scroll
+  const quoteEl = document.getElementById('footer-quote');
+  if (quoteEl) {
+    const fullText = quoteEl.dataset.text;
+    const textEl = quoteEl.querySelector('.footer-quote-text');
+    const quoteObs = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          quoteObs.disconnect();
+          let i = 0;
+          const typeSpeed = 22;
+          (function typeNext() {
+            textEl.textContent = fullText.slice(0, i);
+            i++;
+            if (i <= fullText.length) setTimeout(typeNext, typeSpeed);
+            else quoteEl.classList.add('typing-done');
+          })();
+        }
+      });
+    }, { threshold: 0.4 });
+    quoteObs.observe(quoteEl);
+  }
+
   // Section reveal on scroll
   const revealObs = new IntersectionObserver((entries) => {
     entries.forEach((en) => {

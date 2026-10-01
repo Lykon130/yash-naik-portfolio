@@ -111,8 +111,17 @@ button { font-family: inherit; }
   max-width: 1200px; margin: 0 auto; padding: 16px 28px;
   display: flex; align-items: center; justify-content: space-between; gap: 20px;
 }
-.logo { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: .02em; }
-.logo span { color: var(--accent); }
+.logo { display: flex; align-items: center; }
+.logo-mark { width: 38px; height: 37px; display: block; }
+.logo-mark-base { fill: #182540; }
+.logo-mark-f1 { fill: #1e2f52; }
+.logo-mark-f2 { fill: #192843; }
+.logo-mark-f3 { fill: #243a63; }
+.logo-mark-f4 { fill: #141f38; }
+.logo-mark-f5 { fill: #1b2a49; }
+.logo-mark-edges line { stroke: #0a0f1c; stroke-width: 1; opacity: .6; }
+.logo-mark-outline { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linejoin: round; transition: stroke .25s; }
+.logo:hover .logo-mark-outline { stroke: var(--accent2); }
 .nav-links { display: flex; gap: 26px; flex-wrap: wrap; align-items: center; }
 .nav-links a {
   font-size: 13.5px; font-weight: 500; color: var(--text-muted);
@@ -295,9 +304,29 @@ main { position: relative; z-index: 1; }
 .location { font-size: 14px; color: var(--text-muted); }
 
 .site-footer {
-  position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 28px 28px 40px;
+  position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 56px 28px 36px;
+  font-size: 12.5px; color: var(--text-muted);
+}
+.footer-quote {
+  margin: 0 auto 44px; max-width: 620px; min-height: 4.6em; font-family: var(--font-display);
+  font-size: 19px; line-height: 1.6; font-weight: 500; color: var(--text);
+  font-style: italic; text-align: center;
+}
+.footer-quote-cursor {
+  display: inline-block; width: 2px; height: 1em; margin-left: 2px;
+  background: var(--accent); vertical-align: text-bottom;
+  animation: quote-blink 0.9s step-end infinite;
+}
+.footer-quote.typing-done .footer-quote-cursor { animation: none; opacity: 0; transition: opacity .6s ease .6s; }
+@keyframes quote-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.footer-quote-attr {
+  margin-left: 8px; font-size: 15px; font-weight: 500; color: var(--text-muted);
+  opacity: 0; transition: opacity .6s ease;
+}
+.footer-quote.typing-done .footer-quote-attr { opacity: 1; }
+.footer-bottom {
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-  font-size: 12.5px; color: var(--text-muted); border-top: 1px solid var(--border);
+  padding-top: 24px; border-top: 1px solid var(--border);
 }
 
 /* ---------- shared secondary-page header ---------- */
